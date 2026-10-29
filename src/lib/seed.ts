@@ -15,10 +15,22 @@ export async function seedDatabase() {
     sessions.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }),
     sessions.createIndex({ userId: 1 }),
   ]);
-  if (!await users.findOne({ email: "admin@admin.com" })) {
-    await users.updateOne({ email: "admin@admin.com" }, { $setOnInsert: {
-      _id: randomUUID(), name: "Administrador", email: "admin@admin.com",
-      passwordHash: await hash("admin123123", 12), role: "manager", createdBy: null, deleting: false, createdAt: new Date(),
-    } }, { upsert: true });
+  if (!(await users.findOne({ email: "admin@admin.com" }))) {
+    await users.updateOne(
+      { email: "admin@admin.com" },
+      {
+        $setOnInsert: {
+          _id: randomUUID(),
+          name: "Administrador",
+          email: "admin@admin.com",
+          passwordHash: await hash("admin123123", 12),
+          role: "manager",
+          createdBy: null,
+          deleting: false,
+          createdAt: new Date(),
+        },
+      },
+      { upsert: true },
+    );
   }
 }

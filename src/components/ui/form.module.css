@@ -1,0 +1,49 @@
+.form,
+.fields {
+  display: grid;
+  gap: 20px;
+}
+.fields {
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+.form > button {
+  margin-top: 4px;
+}
+.field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.field label {
+  font-size: 14px;
+  font-weight: 600;
+}
+.field input,
+.field textarea,
+.field select {
+  min-height: 48px;
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border: 2px solid var(--ink);
+  border-radius: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+}
+.field textarea {
+  resize: vertical;
+}
+.field [aria-invalid="true"] {
+  border-color: #b42318;
+}
+.error,
+.fieldError {
+  color: #b42318;
+  font-size: 14px;
+  line-height: 1.6;
+}

@@ -1,0 +1,19 @@
+.message {
+  display: grid;
+  min-height: 70svh;
+  max-width: 700px;
+  padding: 48px 24px;
+  margin-inline: auto;
+  align-content: center;
+  justify-items: start;
+  gap: 24px;
+}
+.message h1 {
+  font-size: 40px;
+  letter-spacing: -2px;
+  overflow-wrap: anywhere;
+}
+.message p {
+  color: var(--muted);
+  line-height: 1.6;
+}

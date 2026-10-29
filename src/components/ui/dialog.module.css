@@ -1,0 +1,38 @@
+.dialog {
+  width: min(560px, calc(100vw - 40px));
+  max-height: calc(100svh - 48px);
+  padding: 0;
+  border: 3px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 8px 8px 0 var(--ink);
+}
+.dialog::backdrop {
+  background: rgb(11 11 11 / 55%);
+}
+.dialogHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px;
+  border-bottom: 2px solid var(--ink);
+}
+.dialogHeader h2 {
+  font-size: 24px;
+  letter-spacing: -1px;
+  overflow-wrap: anywhere;
+}
+.dialogBody {
+  display: grid;
+  gap: 24px;
+  padding: 24px;
+}
+.dialogBody p {
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.dialogBody h3 {
+  overflow-wrap: anywhere;
+}

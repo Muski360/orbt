@@ -19,10 +19,26 @@
   cursor: pointer;
 }
 
-.taskTitleButton:hover { text-decoration: underline; text-underline-offset: 3px; }
-.dragHandle:disabled { opacity: .35; cursor: default; }
-.statusSelect:disabled { opacity: .8; cursor: default; }
-.saveError { margin-top: 16px; padding: 12px; border: 2px solid #b42318; color: #b42318; font-size: 14px; line-height: 1.6; }
+.taskTitleButton:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.dragHandle:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.statusSelect:disabled {
+  opacity: 0.8;
+  cursor: default;
+}
+.saveError {
+  margin-top: 16px;
+  padding: 12px;
+  border: 2px solid #b42318;
+  color: #b42318;
+  font-size: 14px;
+  line-height: 1.6;
+}
 
 .board {
   border: 2px solid var(--ink);
@@ -75,7 +91,9 @@
   color: var(--surface);
   font-size: 28px;
   cursor: pointer;
-  transition: color 120ms, background 120ms;
+  transition:
+    color 120ms,
+    background 120ms;
 }
 
 .resetButton:hover {
@@ -102,6 +120,10 @@
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scrollbar-width: none;
+  cursor: auto;
+}
+
+.viewport[data-scrollable="true"] {
   cursor: grab;
 }
 
@@ -136,12 +158,36 @@
   flex-direction: column;
   border: 1px solid #b8b5ab;
   background: #e9e7de;
-  transition: background 120ms, border-color 120ms;
+  transition:
+    background 120ms,
+    border-color 120ms;
 }
 
 .column[data-over="true"] {
   border-color: var(--ink);
+  background: #e5eacb;
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+
+.column[data-over="true"] .columnHeader {
   background: var(--accent);
+}
+.dropHint {
+  display: grid;
+  min-height: 100px;
+  flex-shrink: 0;
+  padding: 16px 8px;
+  gap: 8px;
+  place-content: center;
+  justify-items: center;
+  border: 2px dashed var(--ink);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 11px;
+  text-align: center;
+}
+.dropHint > span {
+  font-size: 28px;
+  line-height: 1;
 }
 
 .columnHeader {
@@ -200,6 +246,7 @@
 }
 
 .task {
+  position: relative;
   padding: 12px;
   border: 2px solid var(--ink);
   background: var(--surface);
@@ -207,8 +254,28 @@
 }
 
 .task[data-dragging="true"] {
-  opacity: 0.3;
   border-style: dashed;
+  border-color: #827f75;
+  background: transparent;
+}
+
+.task[data-dragging="true"] > div {
+  opacity: 0;
+}
+.task[data-dragging="true"]::after {
+  content: "Em movimento";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 11px;
+  pointer-events: none;
+}
+.task[data-saving="true"] {
+  border-color: var(--ink);
+  box-shadow: inset 0 -3px 0 var(--accent);
 }
 
 .taskHeading {
@@ -239,7 +306,6 @@
   border: 0;
   background: transparent;
   color: var(--muted);
-  font-size: 26px;
   cursor: grab;
   touch-action: none;
 }
@@ -271,7 +337,11 @@
   font-size: 12px;
 }
 
-.assignee > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.assignee > span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 .avatar {
   display: grid;
@@ -362,22 +432,33 @@
 }
 
 .dragOverlay {
-  width: 212px;
-  min-height: 132px;
-  box-shadow: 6px 6px 0 var(--ink);
+  display: none;
+  box-shadow: 8px 8px 0 var(--ink);
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  cursor: grabbing;
 }
-
-.dragOverlay p {
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 1.4;
-}
-
-.dragOverlay span {
+.dragOverlay[data-dnd-dragging] {
   display: block;
-  margin-top: 24px;
-  color: var(--muted);
-  font-size: 12px;
+}
+.dragOverlay .dragHandle {
+  opacity: 1;
+  background: var(--accent);
+  color: var(--ink);
+}
+.dragOverlay .statusSelect:disabled {
+  opacity: 1;
+}
+.savingStatus {
+  display: inline-flex;
+  margin-left: 16px;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+}
+.savingStatus > span {
+  width: 14px;
+  height: 14px;
 }
 
 .srOnly {
@@ -390,6 +471,16 @@
 }
 
 @media (max-width: 520px) {
+  .completion {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    row-gap: 8px;
+  }
+  .savingStatus {
+    width: 100%;
+    margin-left: 0;
+  }
   .board {
     box-shadow: 5px 5px 0 var(--ink);
   }

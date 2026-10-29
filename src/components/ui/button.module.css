@@ -1,0 +1,56 @@
+.primary,
+.secondary,
+.danger {
+  display: inline-flex;
+  min-height: 48px;
+  padding: 12px 18px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border: 2px solid var(--ink);
+  border-radius: 0;
+  background: var(--accent);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+.primary {
+  box-shadow: 3px 3px 0 var(--ink);
+}
+.secondary {
+  background: var(--paper);
+}
+.danger {
+  background: #b42318;
+  color: white;
+}
+.primary:hover:not(:disabled),
+.secondary:hover:not(:disabled) {
+  background: var(--surface);
+}
+.danger:hover:not(:disabled) {
+  background: #8d1c12;
+}
+.primary:disabled,
+.secondary:disabled,
+.danger:disabled,
+.icon:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+.icon {
+  display: inline-grid;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  flex-shrink: 0;
+  place-items: center;
+  border: 2px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 26px;
+  cursor: pointer;
+}

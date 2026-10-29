@@ -15,7 +15,8 @@ export function useDragScroll(reducedMotion: boolean | null) {
       if (!viewport) return;
       setEdges({
         left: viewport.scrollLeft > 1,
-        right: viewport.scrollLeft + viewport.clientWidth < viewport.scrollWidth - 1,
+        right:
+          viewport.scrollLeft + viewport.clientWidth < viewport.scrollWidth - 1,
       });
     }
 
@@ -32,18 +33,24 @@ export function useDragScroll(reducedMotion: boolean | null) {
 
   function onPointerDown(event: PointerEvent<HTMLDivElement>) {
     if (
-      event.pointerType !== "mouse" || event.button !== 0 ||
+      event.pointerType !== "mouse" ||
+      event.button !== 0 ||
       (event.target as HTMLElement).closest("button, select, [data-task]")
-    ) return;
+    )
+      return;
 
-    pan.current = { x: event.clientX, scrollLeft: event.currentTarget.scrollLeft };
+    pan.current = {
+      x: event.clientX,
+      scrollLeft: event.currentTarget.scrollLeft,
+    };
     event.currentTarget.setPointerCapture(event.pointerId);
     event.currentTarget.dataset.panning = "true";
   }
 
   function onPointerMove(event: PointerEvent<HTMLDivElement>) {
     if (!pan.current) return;
-    event.currentTarget.scrollLeft = pan.current.scrollLeft + pan.current.x - event.clientX;
+    event.currentTarget.scrollLeft =
+      pan.current.scrollLeft + pan.current.x - event.clientX;
   }
 
   function endPan(event: PointerEvent<HTMLDivElement>) {
@@ -62,10 +69,15 @@ export function useDragScroll(reducedMotion: boolean | null) {
   }
 
   return {
-    ref, edges, scroll,
+    ref,
+    edges,
+    scroll,
     handlers: {
-      onPointerDown, onPointerMove,
-      onPointerUp: endPan, onPointerCancel: endPan, onLostPointerCapture: endPan,
+      onPointerDown,
+      onPointerMove,
+      onPointerUp: endPan,
+      onPointerCancel: endPan,
+      onLostPointerCapture: endPan,
     },
   };
 }

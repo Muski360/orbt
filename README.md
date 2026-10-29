@@ -1,7 +1,7 @@
 # Especificação de Requisitos de Software — ORBT
 
 **Referência:** ISO/IEC/IEEE 29148:2018  
-**Versão:** 0.3 — MVP implementado<br>
+**Versão:** 0.4 — MVP revisado<br>
 **Data:** 29/10/2026  
 **Cliente fictício:** Agência Criativa StartUp  
 **Estado:** MVP implementado; execução local com MongoDB standalone.
@@ -54,10 +54,14 @@ npm start
 - `src/app`: rotas App Router, consultas em Server Components e alterações em Server Actions.
 - `src/components/landing`: landing e estado da demonstração; independente do banco.
 - `src/components/kanban`: quadro compartilhado, colunas, tarefas, arraste e navegação horizontal.
-- `src/components/workspace`: navegação autenticada, formulários, diálogos e telas do produto.
-- `src/lib`: conexão MongoDB, sessões JWT, credenciais bcrypt, validação Zod e permissões por domínio.
+- `src/components/workspace`: navegação autenticada e telas do produto.
+- `src/components/ui`: formulários, campos, diálogos, confirmações, botões e indicadores compartilhados.
+- `src/lib/workspace`: regras e consultas separadas em projetos, membros, tarefas e autorização.
+- `src/lib`: conexão MongoDB, sessões JWT, credenciais bcrypt, validação Zod, tipos, conversão de documentos e formatação.
 - `scripts/seed.ts`: inicialização idempotente do banco.
 - `tests`: integração com MongoDB e fluxos Playwright.
+
+A organização, as correções da revisão e as convenções de manutenção estão em [Arquitetura e revisão do site](docs/architecture.md).
 
 O driver oficial MongoDB utiliza as coleções `users`, `projects`, `tasks` e `sessions`. Projetos armazenam proprietário e participantes; tarefas armazenam projeto e responsável opcional. IDs são UUIDs em formato string. Índices atendem consultas por proprietário, participação e projeto, e garantem e-mail único. O índice TTL elimina sessões expiradas; a autorização verifica a expiração mesmo antes da limpeza automática.
 
@@ -83,7 +87,7 @@ Os testes exigem MongoDB disponível e utilizam exclusivamente **orbt_test**, co
 
 Playwright compila a aplicação, inicializa o banco de teste e abre uma instância independente na porta **3100**, com segredo próprio para testes. A configuração utiliza o **Google Chrome instalado** (`channel: chrome`). As verificações cobrem autenticação, expiração e revogação, permissões, CRUD, reatribuição, chamadas diretas às Server Actions, persistência, falha de salvamento, retomada de exclusões, arraste, teclado, toque emulado e responsividade.
 
-Na verificação local de 29/10/2026, os sete testes de servidor e os seis testes de navegador passaram. Também foram conferidos persistência e sessão após reiniciar o processo da aplicação, telas entre 320 e 1440 px e dez estados de tela ou diálogo com axe, sem violações automáticas WCAG A/AA detectadas. Toque foi emulado no Chrome; não houve validação em aparelhos físicos ou de uma implantação HTTPS.
+Na revisão local de 29/10/2026, os oito testes de servidor e os nove testes de navegador passaram. Também foram conferidos persistência e sessão, telas entre 320 e 1440 px e dezesseis estados de tela ou diálogo com axe, sem violações automáticas detectadas. Toque foi emulado no Chrome; não houve validação em aparelhos físicos ou de uma implantação HTTPS. O resultado detalhado está em [Arquitetura e revisão do site](docs/architecture.md).
 
 ### 1.1 Propósito
 
@@ -316,3 +320,4 @@ O diagrama representa relações de negócio; não define o formato físico das 
 | 0.1 | 29/10/2026 | Levantamento inicial do MVP e registro das decisões e pendências. |
 | 0.2 | 29/10/2026 | Atualização das decisões sobre contas, permissões, projetos, sessão e ambiente. |
 | 0.3 | 29/10/2026 | Implementação do MVP com autenticação, MongoDB, permissões, quadros persistidos e testes; instruções de instalação e retomada de exclusões. |
+| 0.4 | 29/10/2026 | Revisão dos fluxos, autenticação, acessibilidade e arquitetura; componentes compartilhados, código padronizado e novos testes de regressão. |

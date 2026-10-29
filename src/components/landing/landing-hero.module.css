@@ -20,7 +20,9 @@
 .title span {
   margin-left: 0.03em;
   background: var(--accent);
-  box-shadow: 6px 0 0 var(--accent), -4px 0 0 var(--accent);
+  box-shadow:
+    6px 0 0 var(--accent),
+    -4px 0 0 var(--accent);
 }
 
 .description {
@@ -45,7 +47,9 @@
   text-decoration: none;
   font-size: 16px;
   font-weight: 600;
-  transition: transform 120ms ease, box-shadow 120ms ease;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease;
 }
 
 .cta span {
