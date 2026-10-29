@@ -10,6 +10,23 @@ Este documento é organizado com base na ISO/IEC/IEEE 29148:2018 e utiliza como 
 
 ## 1. Introdução
 
+### 1.0 Configuração local
+
+Copie `.env.example` para `.env.local` e ajuste os valores antes de executar a aplicação:
+
+```bash
+cp .env.example .env.local
+```
+
+As variáveis atuais são:
+
+| Variável | Uso |
+| --- | --- |
+| `MONGODB_URI` | String de conexão com o MongoDB. |
+| `JWT_SECRET` | Segredo usado para assinar tokens de autenticação. |
+
+O arquivo `.env.local` é ignorado pelo Git. Nunca versione credenciais, chaves reais ou strings de conexão de ambientes compartilhados.
+
 ### 1.1 Propósito
 
 Definir os requisitos do ORBT para orientar o desenvolvimento, a validação e a avaliação do produto por cliente, equipe de desenvolvimento e testes.
