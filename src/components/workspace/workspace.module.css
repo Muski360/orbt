@@ -34,6 +34,16 @@
   gap: 8px;
   margin-top: 56px;
 }
+.navigationLoading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+  margin-top: 56px;
+  color: #c3c1b9;
+  font-size: 12px;
+  line-height: 1.5;
+}
 .nav a {
   display: flex;
   min-height: 52px;
@@ -354,6 +364,13 @@
     grid-row: 2;
     margin: 0;
     gap: 8px;
+  }
+  .navigationLoading {
+    grid-column: 2;
+    grid-row: 1;
+    margin: 0;
+    gap: 8px;
+    font-size: 11px;
   }
   .nav a {
     min-height: 44px;

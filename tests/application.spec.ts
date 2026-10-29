@@ -20,8 +20,17 @@ async function replayAction(context: BrowserContext, request: Request) {
 }
 
 test("protege rotas e informa credenciais inválidas", async ({ page }) => {
-  await page.goto("/projetos");
-  await expect(page).toHaveURL(/\/login$/);
+  for (const route of [
+    "/projetos",
+    "/membros",
+    "/projetos/00000000-0000-4000-8000-000000000000",
+  ]) {
+    await page.goto(route);
+    await expect(page).toHaveURL(/\/login$/);
+    await expect(
+      page.getByRole("navigation", { name: "Navegação da aplicação" }),
+    ).toHaveCount(0);
+  }
   await page.getByLabel("E-mail", { exact: false }).fill("admin@admin.com");
   await page.getByLabel("Senha", { exact: false }).fill("incorreta");
   let release!: () => void;

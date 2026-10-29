@@ -73,6 +73,8 @@ flowchart LR
 
 As regras de acesso ficam em `lib/workspace/access.ts` e são usadas pelos domínios. Os componentes controlam apresentação, edição e estados de interação; a autorização permanece no servidor.
 
+O layout autenticado renderiza a estrutura de forma síncrona. Somente a navegação consulta a sessão, dentro de seu próprio `Suspense`, sem redirecionar no layout. Cada página e Server Action mantém `requireUser()` antes de acessar os dados. Isso permite que a validação de navegação instantânea alcance as páginas durante o prefetch, inclusive quando não há sessão.
+
 As consultas de rota retornam dados próprios para a interface. `views.ts` seleciona explicitamente os campos públicos de usuários e projetos. Hashes, tokens de sessão e dados da trava não são enviados aos componentes do navegador.
 
 `ActionForm` reúne envio, validação, falha de rede, foco e estado de gravação. `ConfirmDialog` combina esse comportamento com a confirmação de uma operação. Seus estilos ficam em `components/ui`, com os mesmos botões compartilhados pelas telas. Os arquivos de `workspace` tratam os fluxos do produto.
