@@ -1,10 +1,10 @@
 # Especificação de Requisitos de Software — ORBT
 
 **Referência:** ISO/IEC/IEEE 29148:2018  
-**Versão:** 0.2 — levantamento de requisitos  
+**Versão:** 0.3 — MVP implementado<br>
 **Data:** 29/10/2026  
 **Cliente fictício:** Agência Criativa StartUp  
-**Estado:** requisitos propostos; implementação ainda não concluída.
+**Estado:** MVP implementado; execução local com MongoDB standalone.
 
 Este documento é organizado com base na ISO/IEC/IEEE 29148:2018 e utiliza como referência de apresentação o [README do Fit Life](https://github.com/Muski360/fit_life). Sua estrutura, por si só, não comprova conformidade com a norma.
 
@@ -12,20 +12,78 @@ Este documento é organizado com base na ISO/IEC/IEEE 29148:2018 e utiliza como 
 
 ### 1.0 Configuração local
 
-Copie `.env.example` para `.env.local` e ajuste os valores antes de executar a aplicação:
+Pré-requisitos: Node.js **22.18 ou superior**, npm e MongoDB local em execução. O Compass é o cliente para inspecionar o banco; a aplicação se conecta ao serviço MongoDB.
 
-```bash
-cp .env.example .env.local
+No PowerShell:
+
+```powershell
+npm install
+Copy-Item .env.example .env.local
+node -e "console.log(require('node:crypto').randomBytes(48).toString('hex'))"
 ```
 
-As variáveis atuais são:
+Cole o valor gerado em `JWT_SECRET` no arquivo `.env.local` e confira as demais variáveis. Se o arquivo já existir, preserve sua configuração.
 
 | Variável | Uso |
 | --- | --- |
-| `MONGODB_URI` | String de conexão com o MongoDB. |
-| `JWT_SECRET` | Segredo usado para assinar tokens de autenticação. |
+| `MONGODB_URI` | Conexão de uso, por padrão `mongodb://127.0.0.1:27017/orbt`. |
+| `JWT_SECRET` | Segredo aleatório com pelo menos 32 bytes para assinar JWTs. |
+| `APP_URL` | Origem da aplicação, por padrão `http://localhost:3000`. Use uma URL `https://` quando houver HTTPS; ela também determina o atributo Secure do cookie. |
+| `MONGODB_TEST_URI` | Banco exclusivo dos testes, por padrão `mongodb://127.0.0.1:27017/orbt_test`. |
 
 O arquivo `.env.local` é ignorado pelo Git. Nunca versione credenciais, chaves reais ou strings de conexão de ambientes compartilhados.
+
+```powershell
+npm run db:seed
+npm run dev
+```
+
+Acesse [localhost:3000/login](http://localhost:3000/login). Entre com **admin@admin.com** e **admin123123**. A inicialização cria índices e a conta inicial quando ausentes; executá-la novamente não sobrescreve contas, senhas ou projetos. As contas cadastradas pela interface sempre são membros; não há promoção a gerente.
+
+Rotas: `/` apresenta a landing e sua demonstração local; `/login` autentica; `/projetos` lista projetos; `/projetos/[id]` contém o quadro persistido; `/membros` é exclusiva do gerente.
+
+Para executar uma compilação de produção local:
+
+```powershell
+npm run build
+npm start
+```
+
+### 1.0.1 Arquitetura
+
+- `src/app`: rotas App Router, consultas em Server Components e alterações em Server Actions.
+- `src/components/landing`: landing e estado da demonstração; independente do banco.
+- `src/components/kanban`: quadro compartilhado, colunas, tarefas, arraste e navegação horizontal.
+- `src/components/workspace`: navegação autenticada, formulários, diálogos e telas do produto.
+- `src/lib`: conexão MongoDB, sessões JWT, credenciais bcrypt, validação Zod e permissões por domínio.
+- `scripts/seed.ts`: inicialização idempotente do banco.
+- `tests`: integração com MongoDB e fluxos Playwright.
+
+O driver oficial MongoDB utiliza as coleções `users`, `projects`, `tasks` e `sessions`. Projetos armazenam proprietário e participantes; tarefas armazenam projeto e responsável opcional. IDs são UUIDs em formato string. Índices atendem consultas por proprietário, participação e projeto, e garantem e-mail único. O índice TTL elimina sessões expiradas; a autorização verifica a expiração mesmo antes da limpeza automática.
+
+O JWT dura uma hora e corresponde a uma sessão no banco. Sair revoga essa sessão; não há renovação automática. Senhas usam bcrypt com custo 12 e limite técnico de 72 bytes UTF-8. E-mails são normalizados; dez tentativas inválidas consecutivas bloqueiam a conta por quinze minutos. Dados autenticados ficam fora de cache compartilhado, com carregamentos dinâmicos dentro de Suspense.
+
+Cada alteração verifica autenticação e permissões no servidor. A interface usa CSS Modules, dnd-kit e Motion, com suporte a teclado, toque e movimento reduzido, seguindo a [identidade visual](docs/visual-identity.md). Não há ordenação manual persistida entre tarefas da mesma coluna. Alterações de outras pessoas aparecem pelo botão **Atualizar** ou ao recarregar.
+
+### 1.0.2 Exclusões e falhas
+
+O MongoDB local standalone não oferece transações entre coleções. Exclusões registram um estado pendente antes da limpeza e bloqueiam o acesso correspondente. A aplicação só confirma sucesso ao terminar. O gerente pode usar **Concluir exclusão** ou **Concluir retirada** para retomar operações interrompidas; tarefas de contas removidas são preservadas sem responsável.
+
+Gravações relacionadas a um projeto usam uma trava temporária no documento para evitar conflitos com exclusões e retiradas. Se o processo for interrompido, a trava expira em até sessenta segundos; aguarde esse período e tente novamente. Durante o salvamento de uma movimentação, o quadro bloqueia novas movimentações. Se a gravação falhar, restaura o estado anterior e apresenta o erro.
+
+### 1.0.3 Verificação
+
+```powershell
+npm run lint
+npm run test:server
+npm run test:e2e
+```
+
+Os testes exigem MongoDB disponível e utilizam exclusivamente **orbt_test**, com proteção contra outra seleção de banco. Não limpam o banco `orbt`. A integração usa registros identificados por teste e remove seus próprios dados ao terminar; um teste de navegador interrompido pode deixar dados com prefixo `E2E` em `orbt_test`.
+
+Playwright compila a aplicação, inicializa o banco de teste e abre uma instância independente na porta **3100**, com segredo próprio para testes. A configuração utiliza o **Google Chrome instalado** (`channel: chrome`). As verificações cobrem autenticação, expiração e revogação, permissões, CRUD, reatribuição, chamadas diretas às Server Actions, persistência, falha de salvamento, retomada de exclusões, arraste, teclado, toque emulado e responsividade.
+
+Na verificação local de 29/10/2026, os sete testes de servidor e os seis testes de navegador passaram. Também foram conferidos persistência e sessão após reiniciar o processo da aplicação, telas entre 320 e 1440 px e dez estados de tela ou diálogo com axe, sem violações automáticas WCAG A/AA detectadas. Toque foi emulado no Chrome; não houve validação em aparelhos físicos ou de uma implantação HTTPS.
 
 ### 1.1 Propósito
 
@@ -78,12 +136,12 @@ O banco de dados será inicializado com uma conta de gerente: **admin@admin.com*
 - Persistência em MongoDB, com configuração de conexão protegida.
 - Autenticação com JWT e armazenamento de senhas como hashes bcrypt.
 - A aplicação será responsiva para uso em diferentes tamanhos de tela, em ambiente escolar controlado.
-- Não foram definidos limites adicionais para campos ou volume de dados, além dos campos obrigatórios e das regras de negócio indicadas neste documento.
+- Não foram definidos limites de negócio adicionais para campos ou volume de dados; permanecem os limites técnicos do MongoDB, das Server Actions e de 72 bytes UTF-8 por senha bcrypt.
 - O cadastro de contas será simples, adequado à atividade escolar; não foi solicitado um fluxo completo de recuperação de senha ou entrega de credenciais.
 
 ## 3. Requisitos funcionais
 
-Todos os requisitos desta seção têm prioridade **alta** e pertencem ao MVP. Os critérios são resultados esperados para validação, não uma indicação de que já foram implementados.
+Todos os requisitos desta seção têm prioridade **alta** e pertencem ao MVP. Os critérios descrevem o comportamento de aceite; os comandos de verificação estão na seção 1.0.3.
 
 ### RF-001 — Autenticar usuário
 
@@ -155,6 +213,7 @@ O sistema deve permitir que o gerente e os membros de um projeto criem tarefas n
 - [ ] Uma tarefa pode ser criada sem responsável.
 - [ ] Ao criar uma tarefa, o membro pode atribuí-la a um integrante do projeto ou deixá-la sem atribuição.
 - [ ] A tarefa é persistida e exibida na coluna correspondente ao seu status.
+- [ ] Toda tarefa começa em **A Fazer**.
 
 ### RF-009 — Consultar tarefas e quadro Kanban
 
@@ -256,3 +315,4 @@ O diagrama representa relações de negócio; não define o formato físico das 
 | --- | --- | --- |
 | 0.1 | 29/10/2026 | Levantamento inicial do MVP e registro das decisões e pendências. |
 | 0.2 | 29/10/2026 | Atualização das decisões sobre contas, permissões, projetos, sessão e ambiente. |
+| 0.3 | 29/10/2026 | Implementação do MVP com autenticação, MongoDB, permissões, quadros persistidos e testes; instruções de instalação e retomada de exclusões. |
