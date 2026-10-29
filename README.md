@@ -6,7 +6,7 @@
 **Cliente fictício:** Agência Criativa StartUp  
 **Estado:** MVP implementado; execução local com MongoDB standalone.
 
-Este documento é organizado com base na ISO/IEC/IEEE 29148:2018 e utiliza como referência de apresentação o [README do Fit Life](https://github.com/Muski360/fit_life). Sua estrutura, por si só, não comprova conformidade com a norma.
+Este documento é organizado com base na ISO/IEC/IEEE 29148:2018.
 
 ## 1. Introdução
 
